@@ -11,7 +11,7 @@ import MainPage from "./pages/MainPage";
 import Volcano from "./components/Volcano/Volcano";
 import Community from "./components/Community/Community";
 import SelfCare from "./components/SelfCare/SelfCare";
-import MoodGarden from "./components/TestFireBase/MoodLogs";
+import MoodGarden from "./components/MoodGarden/MoodGarden";
 
 function App() {
   return (
