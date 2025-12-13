@@ -2,6 +2,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { ToastProvider } from "./context/ToastContext";
 import PrivateRoute from "./context/PrivateRoute";
 
 import SplashPage from "./components/LoginRegister/SplashPage";
@@ -12,11 +13,13 @@ import Volcano from "./components/Volcano/Volcano";
 import Community from "./components/Community/Community";
 import SelfCare from "./components/SelfCare/SelfCare";
 import MoodGarden from "./components/MoodGarden/MoodGarden";
+import AIVirtualFriend from "./components/AIVirtualFriend/AIVirtualFriend";
 
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      <ToastProvider>
+        <Router>
         <Routes>
           <Route path="/" element={<Navigate to="/splash" replace />} />
           <Route path="/splash" element={<SplashPage />} />
@@ -64,8 +67,17 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/ai-friend"
+            element={
+              <PrivateRoute>
+                <AIVirtualFriend />
+              </PrivateRoute>
+            }
+          />
         </Routes>
       </Router>
+      </ToastProvider>
     </AuthProvider>
   );
 }
