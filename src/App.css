@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 8023c9e594b9057239cb2de7113d5ff2e0b7b4fc
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -19,6 +23,42 @@
 }
 
 @keyframes logo-spin {
+<<<<<<< HEAD
+=======
+=======
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+>>>>>>> 3959c23a1a4a38192c413bc97c3023d1bae8071a
+>>>>>>> 8023c9e594b9057239cb2de7113d5ff2e0b7b4fc
   from {
     transform: rotate(0deg);
   }
@@ -26,6 +66,10 @@
     transform: rotate(360deg);
   }
 }
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 8023c9e594b9057239cb2de7113d5ff2e0b7b4fc
 
 @media (prefers-reduced-motion: no-preference) {
   a:nth-of-type(2) .logo {
@@ -40,3 +84,8 @@
 .read-the-docs {
   color: #888;
 }
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> 3959c23a1a4a38192c413bc97c3023d1bae8071a
+>>>>>>> 8023c9e594b9057239cb2de7113d5ff2e0b7b4fc
