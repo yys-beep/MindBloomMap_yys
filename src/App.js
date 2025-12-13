@@ -12,6 +12,7 @@ import Volcano from "./components/Volcano/Volcano";
 import Community from "./components/Community/Community";
 import SelfCare from "./components/SelfCare/SelfCare";
 import MoodGarden from "./components/MoodGarden/MoodGarden";
+import MusicPlayerPage from "./pages/MusicPlayerPage";
 
 function App() {
   return (
@@ -53,6 +54,14 @@ function App() {
             element={
               <PrivateRoute>
                 <SelfCare />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/music"
+            element={
+              <PrivateRoute>
+                <MusicPlayerPage />
               </PrivateRoute>
             }
           />
