@@ -1,71 +1,24 @@
-// src/App.js
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
-import PrivateRoute from "./context/PrivateRoute";
+// src/App.js - 最终、彻底的隔离测试版本
 
-import SplashPage from "./components/LoginRegister/SplashPage";
-import LoginPage from "./components/LoginRegister/LoginPage";
-import RegisterPage from "./components/LoginRegister/RegisterPage";
-import MainPage from "./pages/MainPage";
-import Volcano from "./components/Volcano/Volcano";
-import Community from "./components/Community/Community";
-import SelfCare from "./components/SelfCare/SelfCare";
-import MoodGarden from "./components/MoodGarden/MoodGarden";
+import React from "react";
+// 导入您的 EmergencyReport 组件 (请确保路径正确！)
+import EmergencyReport from "./components/EmergencyReport/EmergencyReport.js"; 
+
+
+// ⚠️ 其他路由/页面组件的导入保持注释
+// ⚠️ 临时注释掉所有与路由和 Firebase 认证相关的导入
+// import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+// import PrivateRoute from "./context/PrivateRoute";
+// import SplashPage from "./components/LoginRegister/SplashPage";
+// ... 剩下的所有页面组件导入也一并注释掉
 
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Navigate to="/splash" replace />} />
-          <Route path="/splash" element={<SplashPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-
-          {/* Protected Routes */}
-          <Route
-            path="/main"
-            element={
-              <PrivateRoute>
-                <MainPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/volcano"
-            element={
-              <PrivateRoute>
-                <Volcano />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/community"
-            element={
-              <PrivateRoute>
-                <Community />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/self-care"
-            element={
-              <PrivateRoute>
-                <SelfCare />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/mood-garden"
-            element={
-              <PrivateRoute>
-                <MoodGarden />
-              </PrivateRoute>
-            }
-          />
-        </Routes>
-      </Router>
+      <div style={{ padding: '0' }}>
+          <EmergencyReport /> 
+      </div>
     </AuthProvider>
   );
 }
