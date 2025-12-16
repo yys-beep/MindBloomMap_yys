@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import NavigationButtons from '../components/NavigationButtons'; // Now lives inside the page
+import { getAuth, signOut } from 'firebase/auth';
+import NavigationButtons from '../components/NavigationButtons';
 import '../styles/PageContainer.css';
 import '../pages/ProfilePage.css'; 
 
@@ -10,18 +11,24 @@ import emergencyIcon from '../assets/images/emergency.png';
 import logoutIcon from '../assets/images/logout.png';
 import bgImg from '../assets/images/profile_background.png';
 import profilePic from '../assets/images/profilepic.png';
+import { useAuth } from '../context/AuthContext';
+import { getUser } from '../firebases/firebaseService';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
+  const { user: authUser, setUser } = useAuth();
   const fileInputRef = useRef(null);
 
   // --- Main User State ---
-  const [user, setUser] = useState({
-    name: "Chia Jing Yuen",
-    phone: "012-345 6789",
-    email: "chiajy@gmail.com",
+  const [profileData, setProfileData] = useState({
+    name: "",
+    phone: "",
+    email: "",
     avatar: profilePic
   });
+
+  // --- Loading State ---
+  const [isLoading, setIsLoading] = useState(true);
 
   // --- Modal States ---
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -29,12 +36,42 @@ const ProfilePage = () => {
   const [tempAvatar, setTempAvatar] = useState("");
   const [selectedFile, setSelectedFile] = useState(null); 
 
+  // Fetch user data from Firebase on mount
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        if (!authUser || !authUser.uid) {
+          console.error("User not authenticated");
+          return;
+        }
+
+        // Fetch user data from Firebase
+        const dbUser = await getUser(authUser.uid);
+
+        if (dbUser) {
+          setProfileData({
+            name: dbUser.username || "",
+            phone: dbUser.phone || "",
+            email: dbUser.email || authUser.email || "",
+            avatar: dbUser.avatar || profilePic
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [authUser]);
+
   // --- Handlers ---
 
   // 1. Open Edit Window
   const openEditModal = () => {
-    setTempName(user.name);
-    setTempAvatar(user.avatar);
+    setTempName(profileData.name);
+    setTempAvatar(profileData.avatar);
     setSelectedFile(null); 
     setIsEditModalOpen(true);
   };
@@ -57,12 +94,40 @@ const ProfilePage = () => {
 
   // 3. Save Final Changes (The "Done" Action)
   const handleDone = () => {
-    setUser({ ...user, name: tempName, avatar: tempAvatar });
+    setProfileData({ ...profileData, name: tempName, avatar: tempAvatar });
     setIsEditModalOpen(false);
     
     // TODO: Upload 'selectedFile' to Firebase Storage here if it exists
     // TODO: Update Name in Firebase Database here
   };
+
+  // Handle Logout
+  const handleLogout = async () => {
+    try {
+      const auth = getAuth();
+      await signOut(auth);
+      
+      // Clear user from AuthContext
+      setUser(null);
+      
+      navigate("/login", { replace: true });
+    } catch (error) {
+      alert("Logout failed: " + error.message);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="page-container profile-page">
+        <NavigationButtons />
+        <div className="page-content">
+          <div style={{ textAlign: 'center', marginTop: '100px' }}>
+            <p>Loading profile...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="page-container profile-page">
@@ -77,13 +142,13 @@ const ProfilePage = () => {
           {/* --- Main Profile Display --- */}
           <div className="avatar-section">
             <div className="avatar-container">
-              <img src={user.avatar} alt="Profile" className="profile-pic" />
+              <img src={profileData.avatar} alt="Profile" className="profile-pic" />
             </div>
           </div>
 
           <div className="name-section">
             <div className="name-display">
-              <h2>{user.name}</h2>
+              <h2>{profileData.name || "User Name"}</h2>
               <button className="edit-icon-btn" onClick={openEditModal}>
                  <img src={penIcon} alt="Edit" className="edit-icon" />
               </button>
@@ -93,11 +158,11 @@ const ProfilePage = () => {
           <div className="info-section">
             <div className="info-row">
               <span className="label">Phone</span>
-              <span className="value">{user.phone}</span>
+              <span className="value">{profileData.phone || "Not provided"}</span>
             </div>
             <div className="info-row">
               <span className="label">Email</span>
-              <span className="value">{user.email}</span>
+              <span className="value">{profileData.email || "Not provided"}</span>
             </div>
           </div>
 
@@ -111,7 +176,7 @@ const ProfilePage = () => {
 
           <hr className="divider" />
 
-          <div className="action-button logout-btn" onClick={() => navigate('/login')}>
+          <div className="action-button logout-btn" onClick={handleLogout}>
             <div className="icon-wrapper">
                 <img src={logoutIcon} alt="Logout" className="logout-icon" />
             </div>
