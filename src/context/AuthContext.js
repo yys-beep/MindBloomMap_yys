@@ -35,17 +35,11 @@ export const AuthProvider = ({ children }) => {
         user: currentUser,
     };
 
-    return (
-        <AuthContext.Provider value={value}>
-            {/* ⚠️ 注意：我们在这里不进行任何加载检查，直接渲染子组件 */}
-            {children}
-        </AuthContext.Provider>
-    );
-};
+ return (
+    <AuthContext.Provider value={{ user, setUser, loading }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
 
-// 3. 导出 useContext Hook
-export const useAuth = () => {
-    return useContext(AuthContext);
-};
-
-// 4. 导出 PrivateRoute (如果它在这里) - 确保它是空的，或者在 App.js 中注释掉
+export const useAuth = () => useContext(AuthContext);

@@ -10,11 +10,13 @@ import SplashPage from "./components/LoginRegister/SplashPage";
 import LoginPage from "./components/LoginRegister/LoginPage";
 import RegisterPage from "./components/LoginRegister/RegisterPage";
 import MainPage from "./pages/MainPage";
+import ProfilePage from "./pages/ProfilePage";
 import Volcano from "./components/Volcano/Volcano";
 import Community from "./components/Community/Community";
 import SelfCare from "./components/SelfCare/SelfCare";
 import MoodGarden from "./components/MoodGarden/MoodGarden";
 import AIVirtualFriend from "./components/AIVirtualFriend/AIVirtualFriend";
+import MusicPlayer from "./pages/MusicPlayerPage";
 
 function App() {
   return (
@@ -39,6 +41,14 @@ function App() {
               }
             />
             <Route
+              path="/profile"
+              element={
+                <PrivateRoute>
+                  <ProfilePage />
+                </PrivateRoute>
+              }
+            />
+            <Route
               path="/volcano"
               element={
                 <PrivateRoute>
@@ -59,6 +69,14 @@ function App() {
               element={
                 <PrivateRoute>
                   <SelfCare />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/music"
+              element={
+                <PrivateRoute>
+                  <MusicPlayer />
                 </PrivateRoute>
               }
             />
