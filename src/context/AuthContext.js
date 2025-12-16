@@ -1,34 +1,51 @@
-// src/context/AuthContext.js
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../firebases/firebase";
-import { getUser } from "../firebases/firebaseService";
+// src/context/AuthContext.js - 临时安全版本
 
+import React, { createContext, useContext, useState } from 'react';
+
+// 1. 创建 Context
 const AuthContext = createContext();
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+// 2. 导出 AuthProvider 组件
+// 这个组件现在不执行任何 Firebase 认证操作
+export const AuthProvider = ({ children }) => {
+    // 临时设置一个模拟的用户对象，防止依赖它的组件崩溃
+    const [currentUser, setCurrentUser] = useState({ uid: 'guest-id', email: 'guest@test.com' });
+    const [loading, setLoading] = useState(false); // 保持为 false，表示加载完成
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        const dbUser = await getUser(firebaseUser.uid);
-        setUser({ uid: firebaseUser.uid, email: firebaseUser.email, username: dbUser?.username || "" });
-      } else {
-        setUser(null);
-      }
-      setLoading(false);
-    });
+    // 临时模拟登录和注册函数
+    const signIn = (email, password) => {
+        console.log("认证已被临时跳过：尝试登录");
+        return Promise.resolve(true);
+    };
+    const signUp = (email, password) => {
+        console.log("认证已被临时跳过：尝试注册");
+        return Promise.resolve(true);
+    };
+    const logOut = () => {
+         console.log("认证已被临时跳过：尝试退出");
+         setCurrentUser(null);
+         return Promise.resolve(true);
+    };
 
-    return () => unsubscribe();
-  }, []);
+    const value = {
+        currentUser,
+        signIn,
+        signUp,
+        logOut,
+        // ... 其他您可能导出的认证相关函数也在这里添加模拟函数
+    };
 
-  return (
-    <AuthContext.Provider value={{ user, loading }}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
+    return (
+        <AuthContext.Provider value={value}>
+            {/* ⚠️ 注意：我们在这里不进行任何加载检查，直接渲染子组件 */}
+            {children}
+        </AuthContext.Provider>
+    );
+};
 
-export const useAuth = () => useContext(AuthContext);
+// 3. 导出 useContext Hook
+export const useAuth = () => {
+    return useContext(AuthContext);
+};
+
+// 4. 导出 PrivateRoute (如果它在这里) - 确保它是空的，或者在 App.js 中注释掉
