@@ -2,7 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 
-const apiKey = process.env.REACT_APP_API_KEY;
+const apiKey = import.meta.env.VITE_FIREBASE_API_KEY;
 const firebaseConfig = {
   apiKey: apiKey,
   authDomain: "mindbloommap.firebaseapp.com",
