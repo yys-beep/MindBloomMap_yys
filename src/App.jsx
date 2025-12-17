@@ -1,35 +1,89 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from 'react';
+import CommunityMap from './components/CommunityMap';
+import PostDetailPage from './components/PostDetailPage';
+import WritePostPage from './components/WritePostPage';
+import './styles/Community.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  // State to track which screen to show
+  const [currentScreen, setCurrentScreen] = useState('community'); // 'community', 'post-detail', 'write-post', 'report'
+  const [selectedPostId, setSelectedPostId] = useState(null);
+  const [reportData, setReportData] = useState(null);
+
+  // Navigation handlers
+  const handleViewMore = (postId) => {
+    setSelectedPostId(postId);
+    setCurrentScreen('post-detail');
+  };
+
+  const handleBackToCommunity = () => {
+    setCurrentScreen('community');
+    setSelectedPostId(null);
+  };
+
+  const handleGoToWritePost = () => {
+    setCurrentScreen('write-post');
+  };
+
+  const handlePostCreated = () => {
+    setCurrentScreen('community');
+  };
+
+  const handleGoToReport = (data) => {
+    setReportData(data);
+    setCurrentScreen('report');
+    // TODO: Tell your team leader to handle report screen
+    // For now, just show an alert
+    alert(`Report feature:  Navigate to Shuxian's report page\nType: ${data.type}\nContent: ${data.content}`);
+    setCurrentScreen('community'); // Go back after alert
+  };
+
+  const handleBackToMain = () => {
+    // TODO: Tell your team leader to handle this
+    alert('Navigate to Main Page - Team leader will handle this');
+  };
+
+  const handleGoToProfile = () => {
+    // TODO: Tell your team leader to handle this
+    alert('Navigate to Profile Page - Team leader will handle this');
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="App">
+      {/* Show Community Map */}
+      {currentScreen === 'community' && (
+        <CommunityMap 
+          onViewMore={handleViewMore}
+          onGoToWritePost={handleGoToWritePost}
+          onBackToMain={handleBackToMain}
+          onGoToProfile={handleGoToProfile}
+        />
+      )}
+
+      {/* Show Post Detail */}
+      {currentScreen === 'post-detail' && (
+        <PostDetailPage 
+          postId={selectedPostId}
+          onBack={handleBackToCommunity}
+          onGoToReport={handleGoToReport}
+          onBackToMain={handleBackToMain}
+          onGoToProfile={handleGoToProfile}
+        />
+      )}
+
+      {/* Show Write Post */}
+      {currentScreen === 'write-post' && (
+        <WritePostPage 
+          onBack={handleBackToCommunity}
+          onPostCreated={handlePostCreated}
+          onBackToMain={handleBackToMain}
+          onGoToProfile={handleGoToProfile}
+        />
+      )}
+
+      {/* Report screen will be handled by Shuxian */}
+    </div>
+  );
 }
 
-export default App
+export default App;
