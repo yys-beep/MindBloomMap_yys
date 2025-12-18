@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { IoArrowBack } from 'react-icons/io5';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { sendMessage, loadConversationHistory, initializeConversation } from '../../services/geminiService';
@@ -159,7 +160,6 @@ const AIVirtualFriend = () => {
       community: '/community',
     };
 
-    let result = text;
     const parts = [];
     let lastIndex = 0;
 
@@ -230,77 +230,80 @@ const AIVirtualFriend = () => {
 
   return (
     <div className="ai-friend-container">
-      {/* Header */}
-      <div className="chat-header">
-        <button className="back-button" onClick={() => navigate('/main')}>
-          ←
-        </button>
-        <h2>Chat with Friend</h2>
-        <button className="clear-button" onClick={handleClearChat} title="Clear chat history">
-          <img src={trashIcon} alt="Delete" />
-        </button>
-      </div>
+      
+      <div className="content-wrapper">
+        {/* Header */}
+        <div className="chat-header">
+          <button className="back-button" onClick={() => navigate('/self-care')}>
+            <IoArrowBack size={24} />
+          </button>
+          <h2>Chat with Friend</h2>
+          <button className="clear-button" onClick={handleClearChat} title="Clear chat history">
+            <img src={trashIcon} alt="Delete" />
+          </button>
+        </div>
 
-      {/* Messages Area */}
-      <div className="messages-area">
-        {messages.map((msg, index) => (
-          <div
-            key={index}
-            className={`message-bubble ${msg.sender === 'user' ? 'user-message' : 'ai-message'}`}
+        {/* Messages Area */}
+        <div className="messages-area">
+          {messages.map((msg, index) => (
+            <div
+              key={index}
+              className={`message-bubble ${msg.sender === 'user' ? 'user-message' : 'ai-message'}`}
+            >
+              <div className="message-content">
+                {renderMessageWithLinks(msg.message)}
+              </div>
+              <div className="message-time">
+                {new Date(msg.timestamp).toLocaleTimeString([], { 
+                  hour: '2-digit', 
+                  minute: '2-digit' 
+                })}
+              </div>
+            </div>
+          ))}
+          {isLoading && (
+            <div className="message-bubble ai-message">
+              <div className="message-content typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Input Area */}
+        <div className="input-area">
+          <input
+            type="text"
+            className="message-input"
+            placeholder="Type your message..."
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyPress={handleKeyPress}
+            disabled={isLoading}
+          />
+          <button
+            className="send-button"
+            onClick={handleSend}
+            disabled={isLoading || !input.trim()}
           >
-            <div className="message-content">
-              {renderMessageWithLinks(msg.message)}
-            </div>
-            <div className="message-time">
-              {new Date(msg.timestamp).toLocaleTimeString([], { 
-                hour: '2-digit', 
-                minute: '2-digit' 
-              })}
-            </div>
-          </div>
-        ))}
-        {isLoading && (
-          <div className="message-bubble ai-message">
-            <div className="message-content typing-indicator">
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-          </div>
-        )}
-        <div ref={messagesEndRef} />
-      </div>
+            Send
+          </button>
+        </div>
 
-      {/* Input Area */}
-      <div className="input-area">
-        <input
-          type="text"
-          className="message-input"
-          placeholder="Type your message..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyPress={handleKeyPress}
-          disabled={isLoading}
+        {/* Confirmation Dialog */}
+        <Dialog
+          isOpen={isDialogOpen}
+          onClose={() => setIsDialogOpen(false)}
+          onConfirm={confirmClearChat}
+          title="Delete Chat History"
+          message="Are you sure you want to delete all chat history permanently? This action cannot be undone."
+          confirmText="Delete"
+          cancelText="Cancel"
         />
-        <button
-          className="send-button"
-          onClick={handleSend}
-          disabled={isLoading || !input.trim()}
-        >
-          Send
-        </button>
       </div>
-
-      {/* Confirmation Dialog */}
-      <Dialog
-        isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
-        onConfirm={confirmClearChat}
-        title="Delete Chat History"
-        message="Are you sure you want to delete all chat history permanently? This action cannot be undone."
-        confirmText="Delete"
-        cancelText="Cancel"
-      />
     </div>
   );
 };

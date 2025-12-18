@@ -1,4 +1,3 @@
-
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -19,6 +18,10 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  width: 100%;
+  height: 100%; /* 确保高度占满 */
+  /* 防止水平滚动条导致左侧偏移 */
+  overflow-x: hidden; 
 }
 
 a {
@@ -70,4 +73,11 @@ button:focus-visible {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+#root, #root > div {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100%;
+    /* 确保外部包裹 EmergencyReport 的 div 也没有 padding */
 }

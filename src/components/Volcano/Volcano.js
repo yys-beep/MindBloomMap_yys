@@ -4,6 +4,8 @@ import './Volcano.css';
 import volcanoButton from '../../assets/images/volcano_button.png';
 import lavaSplash from '../../assets/images/lava_splash.mp4';
 import pizzaCharacter from '../../assets/images/pizza_character.png';
+import NavigationButtons from '../NavigationButtons';
+import '../../styles/PageContainer.css';
 
 const Volcano = () => {
   const navigate = useNavigate();
@@ -116,13 +118,12 @@ const Volcano = () => {
     setShowBackButton(false);
     setClickCount(0);
     setParticles([]);
+    // Remove any navigation calls here to prevent infinite loops
   };
 
   return (
-    <div className="volcano-container">
-      <button className="volcano-back-btn" onClick={() => navigate('/main')}>
-        ←
-      </button>
+        <div className="volcano-container">
+      <NavigationButtons />
 
       <div className="volcano-content">
         {/* Instruction text */}
