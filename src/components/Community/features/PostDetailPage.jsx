@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { postsData } from '../data/dummyPosts';
 import CommentSection from './CommentSection';
 import postDetailBg from '../assets/images/postdetails-bg.png';
 
 export default function PostDetailPage({ postId, onBack, onGoToReport }) {
+  const navigate = useNavigate();
   const [post, setPost] = useState(postsData.find(p => p.id === postId));
   const [liked, setLiked] = useState(false);
 
@@ -18,7 +20,7 @@ export default function PostDetailPage({ postId, onBack, onGoToReport }) {
 
   const handleReport = () => {
     console.log('Report post:', post.id, post.title);
-    window.location.href = '/emergency-report';
+    navigate('/emergency-report');
   };
 
   const handleDeleteComment = (commentId) => {

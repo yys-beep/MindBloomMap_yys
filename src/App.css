@@ -1,19 +1,8 @@
-/* 例如在 src/index.css 或 src/App.css */
-html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    /* 强制去除可能导致白边的默认 overflow-x 滚动条 */
-    overflow-x: hidden;
-    box-sizing: border-box;
-}
-
-/* 确保您的主要挂载点也无边距 */
 #root {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    box-sizing: border-box;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
 }
 
 .logo {
