@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import CommunityMap from './features/CommunityMap';
 import PostDetailPage from './features/PostDetailPage';
 import WritePostPage from './features/WritePostPage';
+import MyPostsPage from './features/MyPostsPage';
+import { deletePost } from './data/dummyPosts';
 import './styles/Community.css';
 
 function Community() {
-  const [currentScreen, setCurrentScreen] = useState('map'); // 'map', 'post-detail', 'write-post'
+  const [currentScreen, setCurrentScreen] = useState('map'); // 'map', 'post-detail', 'write-post', 'my-posts'
   const [selectedPostId, setSelectedPostId] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0); // For refreshing the map
 
@@ -26,6 +28,11 @@ function Community() {
     setCurrentScreen('write-post');
   };
 
+  // Handle going to my posts page
+  const handleGoToMyPosts = () => {
+    setCurrentScreen('my-posts');
+  };
+
   // Handle after post is created
   const handlePostCreated = () => {
     setCurrentScreen('map');
@@ -37,6 +44,11 @@ function Community() {
     setRefreshKey(prev => prev + 1);
     console.log('Community map refreshed');
   };
+
+  // Handle delete post
+  const handleDeletePost = (postId) => {
+    deletePost(postId); 
+  }; 
 
   // Handle report (temporary - Shuxian will handle)
   const handleGoToReport = (data) => {
@@ -60,6 +72,7 @@ function Community() {
           key={refreshKey}
           onViewMore={handleViewMore}
           onGoToWritePost={handleGoToWritePost}
+          onGoToMyPosts={handleGoToMyPosts}
           onRefresh={handleRefreshMap}
           onBackToMain={handleBackToMain}
           onGoToProfile={handleGoToProfile}
@@ -80,6 +93,15 @@ function Community() {
         <WritePostPage 
           onBack={handleBackToCommunity}
           onPostCreated={handlePostCreated}
+        />
+      )}
+=========
+    {/* Show My Posts Page */}
+      {currentScreen === 'my-posts' && (
+        <MyPostsPage 
+          onBack={handleBackToCommunity}
+          onViewPost={handleViewMore}
+          onDeletePost={handleDeletePost}
         />
       )}
     </div>

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function PostPreviewModal({ post, onClose, onViewMore }) {
+  const navigate = useNavigate();
   const [liked, setLiked] = useState(false);
 
   const handleLike = () => {
@@ -10,7 +12,7 @@ export default function PostPreviewModal({ post, onClose, onViewMore }) {
   const handleReport = () => {
     console.log('Reporting post:', post.id, post.title);
     onClose();  // Close modal first
-    window. location.href = '/emergency-report';  // Navigate to EmergencyReport page
+    navigate('/emergency-report');  // Navigate to EmergencyReport page
   };
 
   return (

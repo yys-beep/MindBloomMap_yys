@@ -18,8 +18,8 @@ const SelfCare = () => {
   const [view, setView] = useState(VIEWS.FOREST);
 
   // Timer state for the Relaxation view
-  const INITIAL_SECONDS = 5 * 60; // 5 minutes
-  const [secondsLeft, setSecondsLeft] = useState(INITIAL_SECONDS);
+  const [timerMinutes, setTimerMinutes] = useState(5); // Default 5 minutes
+  const [secondsLeft, setSecondsLeft] = useState(5 * 60);
   const [running, setRunning] = useState(false);
 
   useEffect(() => {
@@ -36,7 +36,15 @@ const SelfCare = () => {
 
   const resetTimer = () => {
     setRunning(false);
-    setSecondsLeft(INITIAL_SECONDS);
+    setSecondsLeft(timerMinutes * 60);
+  };
+
+  const handleTimerChange = (mins) => {
+    const newMins = Math.max(1, Math.min(60, mins)); // Limit between 1-60 minutes
+    setTimerMinutes(newMins);
+    if (!running) {
+      setSecondsLeft(newMins * 60);
+    }
   };
 
   const minutes = String(Math.floor(secondsLeft / 60)).padStart(2, '0');
@@ -76,6 +84,36 @@ const SelfCare = () => {
   const renderRelaxation = () => (
     <div style={styles.relaxationContainer}>
       <h2>Relaxation Timer</h2>
+      
+      {/* Timer duration selector */}
+      {!running && (
+        <div style={styles.timerSelector}>
+          <label style={styles.timerLabel}>Set Duration (minutes):</label>
+          <div style={styles.timerInputContainer}>
+            <button 
+              style={styles.smallButton} 
+              onClick={() => handleTimerChange(timerMinutes - 1)}
+            >
+              -
+            </button>
+            <input 
+              type="number" 
+              value={timerMinutes} 
+              onChange={(e) => handleTimerChange(parseInt(e.target.value) || 1)}
+              style={styles.timerInput}
+              min="1"
+              max="60"
+            />
+            <button 
+              style={styles.smallButton} 
+              onClick={() => handleTimerChange(timerMinutes + 1)}
+            >
+              +
+            </button>
+          </div>
+        </div>
+      )}
+      
       <div style={styles.timer}>{minutes}:{seconds}</div>
       <div style={styles.verticalButtons}>
         <button style={styles.bigButton} onClick={() => setRunning(r => !r)}>{running ? 'Pause' : 'Start'}</button>
@@ -200,31 +238,72 @@ const styles = {
     position: 'absolute',
     left: '5%',
     top: '50%',
-    width: 221,
-    height: 221,
+    width: 180,
+    height: 180,
     objectFit: 'contain',
     cursor: 'pointer',
     zIndex: 20,
+    pointerEvents: 'auto',
   },
   relaxationImg: {
     position: 'absolute',
-    right: '-14%',
-    top: '57%',
-    width: 240,
-    height: 240,
+    right: '0%',
+    top: '62%',
+    width: 200,
+    height: 200,
     objectFit: 'contain',
     cursor: 'pointer',
     zIndex: 20,
+    pointerEvents: 'auto',
   },
   musicImg: {
     position: 'absolute',
-    left: '15%',
-    bottom: '-2%',
-    width: 252,
-    height: 252,
+    left: '2%',
+    bottom: '10%',
+    width: 180,
+    height: 180,
     objectFit: 'contain',
     cursor: 'pointer',
     zIndex: 20,
+    pointerEvents: 'auto',
+  },
+  timerSelector: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
+  timerLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+  },
+  timerInputContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 10,
+  },
+  timerInput: {
+    width: 60,
+    padding: 8,
+    fontSize: 16,
+    textAlign: 'center',
+    border: '2px solid #08477b',
+    borderRadius: 6,
+    fontWeight: 'bold',
+  },
+  smallButton: {
+    width: 32,
+    height: 32,
+    padding: 0,
+    fontSize: 18,
+    fontWeight: 'bold',
+    borderRadius: 6,
+    cursor: 'pointer',
+    border: 'none',
+    backgroundColor: '#08477b',
+    color: 'white',
   },
 };
 

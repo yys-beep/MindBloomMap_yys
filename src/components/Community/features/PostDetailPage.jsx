@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { dummyPosts } from '../data/dummyPosts';
+import { postsData } from '../data/dummyPosts';
 import CommentSection from './CommentSection';
 import postDetailBg from '../assets/images/postdetails-bg.png';
 
 export default function PostDetailPage({ postId, onBack, onGoToReport }) {
-  const [post, setPost] = useState(dummyPosts.find(p => p.id === postId));
+  const [post, setPost] = useState(postsData.find(p => p.id === postId));
   const [liked, setLiked] = useState(false);
 
   if (!post) {
@@ -18,9 +18,10 @@ export default function PostDetailPage({ postId, onBack, onGoToReport }) {
 
   const handleReport = () => {
     console.log('Report post:', post.id, post.title);
-    alert(`🚨 Report submitted for: "${post.title}"\n\nThank you for helping keep our community safe.`);
+        alert(`🚨 Report submitted for: "${post.title}"\n\nThank you for helping keep our community safe.`);
     // TODO: Replace with actual report API call
     // window.location.href = '/emergency-report';
+    window.location.href = '/emergency-report';
   };
 
   const handleDeleteComment = (commentId) => {

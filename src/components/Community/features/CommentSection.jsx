@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import sendArrow from '../assets/icons/send-arrow.png';
 import HarassmentWarningModal from './HarassmentWarningModal';
 import { analyzeToxicity } from '../utils/toxicityAnalysis';
@@ -58,11 +59,12 @@ export default function CommentSection({ postId, comments, onDeleteComment }) {
     });
   };
 
+  const navigate = useNavigate();
+
   const handleReportComment = (comment) => {
     console.log('Report comment:', comment.id, comment.text);
     alert(`🚨 Comment reported: "${comment.text}"\n\nThank you for helping keep our community safe.`);
-    // TODO: Replace with actual report API call
-    // window.location.href = '/emergency-report';
+    // TODO: Replace with actual report API call when ready
   };
 
   return (

@@ -11,7 +11,7 @@ import btnWrite from '../assets/images/btn-write.png';
 // Import Navigation Component
 import NavigationButtons from './NavigationButtons';
 
-export default function CommunityMap({ onViewMore, onGoToWritePost, onRefresh }) {
+export default function CommunityMap({ onViewMore, onGoToWritePost, onGoToMyPosts , onRefresh }) {
   const [selectedPost, setSelectedPost] = useState(null);
   
   // Shuffle function to randomize posts
@@ -104,127 +104,121 @@ export default function CommunityMap({ onViewMore, onGoToWritePost, onRefresh })
         })}
       </div>
 
-      {/* Bottom left buttons - PERFECTLY ALIGNED */}
-      <div style={{
-        position: 'absolute',
-        bottom: '-10px',
-        left: '-5px',
-        display: 'inline-flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: '0',
-        margin: 0,
-        padding: 0,
-        lineHeight: 0,
-        fontSize: 0,
-        zIndex: 100,
-      }}>
-        {/* Refresh Button - LEFT SIDE */}
-        <button 
-          onClick={(e) => {
+
+{/* Bottom left buttons - PERFECTLY ALIGNED */}
+<div style={{
+  position: 'absolute',
+  bottom: '-10px',
+  left: '-5px',
+  display: 'inline-flex',
+  flexDirection:  'row',
+  alignItems: 'center',     // ← THIS FIXES ALIGNMENT! 
+  gap: '0',
+  margin: 0,
+  padding: 0,
+  lineHeight: 0,
+  fontSize: 0,
+  zIndex: 100,
+}}>
+  {/* Refresh Button - LEFT SIDE */}
+  <button 
+    onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
             handleRefresh();
           }}
-          type="button"
-          title="Refresh"
-          style={{
-            width: '120px',
-            height: '120px',
-            marginRight: '-40px',
-            background: 'transparent',
-            border: 'none',
-            padding: 0,
-            cursor: 'pointer',
-            transition: 'transform 0.2s ease',
-            display: 'inline-block',
-            lineHeight: 0,
-            fontSize: 0,
-            verticalAlign: 'middle',
-            outline: 'none',
-            zIndex: 1,
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'scale(1.1)';
-            e.currentTarget.style.zIndex = '10';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'scale(1)';
-            e.currentTarget.style.zIndex = '1';
-          }}
-        >
-          <img 
-            src={btnRefresh} 
-            alt="refresh" 
-            draggable="false"
-            style={{ 
-              width: '100%', 
-              height: '100%', 
-              display: 'block',
-              objectFit: 'contain',
-              pointerEvents: 'none',
-              userSelect: 'none',
-              margin: 0,
-              padding: 0,
-              border: 'none',
-              filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))'
-            }}
-          />
-        </button>
-
-        {/* Write Post Button - RIGHT SIDE */}
-        <button 
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onGoToWritePost();
-          }}
-          type="button"
-          title="Write Post"
-          style={{
-            width: '135px',
-            height: '135px',
-            background: 'transparent',
-            border: 'none',
-            padding: 0,
-            margin: 0,
-            cursor: 'pointer',
-            transition: 'transform 0.2s ease',
-            display: 'inline-block',
-            lineHeight: 0,
-            fontSize: 0,
-            verticalAlign: 'middle',
-            outline: 'none',
-            zIndex: 0,
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'scale(1.1)';
-            e.currentTarget.style.zIndex = '10';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'scale(1)';
-            e.currentTarget.style.zIndex = '0';
-          }}
-        >
-          <img 
-            src={btnWrite} 
-            alt="write post" 
-            draggable="false"
-            style={{ 
-              width: '100%', 
-              height: '100%', 
-              display: 'block',
-              objectFit: 'contain',
-              pointerEvents: 'none',
-              userSelect: 'none',
-              margin: 0,
-              padding: 0,
-              border: 'none',
-              filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))'
-            }}
-          />
-        </button>
-      </div>
+    type="button"
+    title="Refresh"
+    style={{
+      width: '120px',
+      height: '120px',
+      marginRight: '-40px',     // ← Only ONE marginRight
+      background: 'transparent',
+      border: 'none',
+      padding: 0,
+      cursor: 'pointer',
+      transition: 'transform 0.2s ease',
+      display: 'inline-block',
+      lineHeight: 0,
+      fontSize: 0,
+      verticalAlign: 'middle',  // ← Changed from 'top' to 'middle'
+      outline: 'none',
+      zIndex: 1,
+    }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.transform = 'scale(1.1)';
+      e.currentTarget.style.zIndex = '10';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget. style.transform = 'scale(1)';
+      e.currentTarget.style.zIndex = '1';
+    }}
+  >
+    <img 
+      src={btnRefresh} 
+      alt="refresh" 
+      draggable="false"
+      style={{ 
+        width: '100%', 
+        height: '100%', 
+        display:  'block',
+        objectFit: 'contain',
+        pointerEvents: 'none',
+        userSelect: 'none',
+        margin: 0,
+        padding: 0,
+        border: 'none',
+        filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))'
+      }}
+    />
+  </button><button 
+    onClick={onGoToWritePost}
+    type="button"
+    title="Write Post"
+    style={{
+      width: '135px',
+      height: '135px',
+      background: 'transparent',
+      border: 'none',
+      padding: 0,
+      margin: 0,
+      cursor:  'pointer',
+      transition:  'transform 0.2s ease',
+      display: 'inline-block',
+      lineHeight: 0,
+      fontSize:  0,
+      verticalAlign: 'middle',  // ← Changed from 'top' to 'middle'
+      outline: 'none',
+      zIndex: 0,
+    }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.transform = 'scale(1.1)';
+      e.currentTarget.style.zIndex = '10';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.transform = 'scale(1)';
+      e.currentTarget.style. zIndex = '0';
+    }}
+  >
+    <img 
+      src={btnWrite} 
+      alt="write post" 
+      draggable="false"
+      style={{ 
+        width: '100%', 
+        height: '100%', 
+        display: 'block',
+        objectFit: 'contain',
+        pointerEvents: 'none',
+        userSelect: 'none',
+        margin: 0,
+        padding: 0,
+        border: 'none',
+        filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))'
+      }}
+    />
+  </button>
+</div>
 
       {/* Post preview modal */}
       {selectedPost && (

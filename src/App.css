@@ -1,19 +1,21 @@
-/* 例如在 src/index.css 或 src/App.css */
-html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    /* 强制去除可能导致白边的默认 overflow-x 滚动条 */
-    overflow-x: hidden; 
-    box-sizing: border-box; 
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
 }
 
-/* 确保您的主要挂载点也无边距 */
-#root {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    box-sizing: border-box;
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
 .App {
@@ -55,3 +57,16 @@ html, body {
   }
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
