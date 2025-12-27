@@ -18,6 +18,7 @@ import MoodGarden from "./components/MoodGarden/MoodGarden";
 import AIVirtualFriend from "./components/AIVirtualFriend/AIVirtualFriend";
 import EmergencyReport from "./components/EmergencyReport/EmergencyReport";
 import MusicPlayer from "./pages/MusicPlayerPage";
+import FlowerHouse from "./components/FlowerHouse/FlowerHouse";
 
 function App() {
   return (
@@ -94,6 +95,14 @@ function App() {
               element={
                 <PrivateRoute>
                   <MoodGarden />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/flower-house"
+              element={
+                <PrivateRoute>
+                  <FlowerHouse />
                 </PrivateRoute>
               }
             />
