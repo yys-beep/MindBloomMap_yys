@@ -1,0 +1,8 @@
+
+{
+  "name": "mood-garden",
+  "description": "A therapeutic app tracking mood through plant growth and daily journaling.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
