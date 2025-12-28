@@ -11,7 +11,6 @@ import volcanoImg from '../assets/images/volcano_asset.png';
 import forestImg from '../assets/images/forest_asset.png';
 import sailingImg from '../assets/images/sailing_boat.png';
 import gardenImg from '../assets/images/garden_flowers.png';
-import flowerHouseIcon from '../assets/images/temp_flowerHouse.png';
 
 // Import Navigation Buttons
 import NavigationButtons from '../components/NavigationButtons';
@@ -112,24 +111,6 @@ const MainPage = () => {
         <img src={gardenImg} alt="Flower Garden" className="nav-image" />
         <h2 className="nav-label">Garden</h2>
       </div>
-
-      {/* --- NEW TEMPORARY FLOWER HOUSE ICON (For Development) --- */}
-    <div 
-        // Use the new CSS class defined in MainPage.css (Step 3 below)
-        className={"nav-item flowerhouse-position" + (activeItem === 'flowerhouse' ? ' active' : '')}
-        onClick={() => handleNavigation('/flower-house', 'flowerhouse')} // Links to App.js route
-        onMouseDown={() => setActiveItem('flowerhouse')}
-        onBlur={() => setActiveItem(null)}
-        onKeyDown={(e) => handleKeyActivate(e, '/flower-house', 'flowerhouse')}
-        role="button"
-        tabIndex={0}
-    >
-        {/* Use the imported icon image */}
-        <img src={flowerHouseIcon} alt="Flower House" className="nav-image" />
-        {/* We will hide the label with CSS to make it a small, clean button */}
-        <h2 className="nav-label">Flower House</h2> 
-    </div>
-    {/* ---------------------------------------------------- */}
 
     </div>
   );

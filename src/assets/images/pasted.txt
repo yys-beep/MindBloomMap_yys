@@ -1,0 +1,363 @@
+i have a js file called mood garden, and this are my main page file and css file, provide me the full code to perform the task, the plants(bloom) try to use code to perform, if you suggest use image, i will use image, and i will put the background image, button image
+
+// src/pages/MainPage.js
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './MainPage.css';
+import { getAuth, signOut } from "firebase/auth";
+import './MainPage.css';
+// Importing Assets (Assumed names based on your description)
+// Ensure these images exist in your src/assets/images folder
+import bgImage from '../assets/images/main_background.png'; // The sea/sky background
+import volcanoImg from '../assets/images/volcano_asset.png';
+import forestImg from '../assets/images/forest_asset.png';
+import sailingImg from '../assets/images/sailing_boat.png';
+import gardenImg from '../assets/images/garden_flowers.png';
+import flowerHouseIcon from '../assets/images/temp_flowerHouse.png';
+
+// Import Navigation Buttons
+import NavigationButtons from '../components/NavigationButtons';
+
+const MainPage = () => {
+  const navigate = useNavigate();
+  const [activeItem, setActiveItem] = useState(null);
+
+  // Logout function
+  const auth = getAuth();
+  const handleLogout = async () => {
+    try {
+      await signOut(auth); // no need to getAuth here; use default auth in context
+      navigate("/login", { replace: true });
+    } catch (error) {
+      alert("Logout failed: " + error.message);
+    }
+  };
+
+  // Navigation handlers with brief active animation
+  const handleNavigation = (path, key) => {
+    setActiveItem(key);
+    // delay navigation slightly to allow animation to show
+    setTimeout(() => {
+      navigate(path);
+    }, 180); // match CSS transition duration
+  };
+
+  const handleKeyActivate = (e, path, key) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleNavigation(path, key);
+    }
+  };
+
+  return (
+    <div className="main-page-container page-container">
+      {/* Ensure navigation buttons are only inside the container */}
+      <NavigationButtons />
+
+      {/* 1. Base Layer: Background Image */}
+      <img src={bgImage} alt="World Map Background" className="background-layer" />
+
+      {/* 2. Interactive Layer: Navigation Items */}
+      
+      {/* Volcano -> Volcano Interaction */}
+      <div 
+        className={"nav-item volcano-position" + (activeItem === 'volcano' ? ' active' : '')}
+        onClick={() => handleNavigation('/volcano', 'volcano')}
+        onMouseDown={() => setActiveItem('volcano')}
+        onBlur={() => setActiveItem(null)}
+        onKeyDown={(e) => handleKeyActivate(e, '/volcano', 'volcano')}
+        role="button"
+        tabIndex={0}
+      >
+        <img src={volcanoImg} alt="Volcano" className="nav-image" />
+        <h2 className="nav-label">Volcano</h2>
+      </div>
+
+      {/* Forest -> SelfCare */}
+      <div 
+        className={"nav-item forest-position" + (activeItem === 'forest' ? ' active' : '')}
+        onClick={() => handleNavigation('/self-care', 'forest')}
+        onMouseDown={() => setActiveItem('forest')}
+        onBlur={() => setActiveItem(null)}
+        onKeyDown={(e) => handleKeyActivate(e, '/self-care', 'forest')}
+        role="button"
+        tabIndex={0}
+      >
+        <img src={forestImg} alt="Forest" className="nav-image" />
+        <h2 className="nav-label">Forest</h2>
+      </div>
+
+      {/* Sailing -> Community */}
+      <div 
+        className={"nav-item sailing-position" + (activeItem === 'sailing' ? ' active' : '')}
+        onClick={() => handleNavigation('/community', 'sailing')}
+        onMouseDown={() => setActiveItem('sailing')}
+        onBlur={() => setActiveItem(null)}
+        onKeyDown={(e) => handleKeyActivate(e, '/community', 'sailing')}
+        role="button"
+        tabIndex={0}
+      >
+        <img src={sailingImg} alt="Sailing Boat" className="nav-image" />
+        <h2 className="nav-label">Sailing</h2>
+      </div>
+
+      {/* Garden -> MoodGarden */}
+      <div 
+        className={"nav-item garden-position" + (activeItem === 'garden' ? ' active' : '')}
+        onClick={() => handleNavigation('/mood-garden', 'garden')}
+        onMouseDown={() => setActiveItem('garden')}
+        onBlur={() => setActiveItem(null)}
+        onKeyDown={(e) => handleKeyActivate(e, '/mood-garden', 'garden')}
+        role="button"
+        tabIndex={0}
+      >
+        <img src={gardenImg} alt="Flower Garden" className="nav-image" />
+        <h2 className="nav-label">Garden</h2>
+      </div>
+
+      {/* --- NEW TEMPORARY FLOWER HOUSE ICON (For Development) --- */}
+    <div 
+        // Use the new CSS class defined in MainPage.css (Step 3 below)
+        className={"nav-item flowerhouse-position" + (activeItem === 'flowerhouse' ? ' active' : '')}
+        onClick={() => handleNavigation('/flower-house', 'flowerhouse')} // Links to App.js route
+        onMouseDown={() => setActiveItem('flowerhouse')}
+        onBlur={() => setActiveItem(null)}
+        onKeyDown={(e) => handleKeyActivate(e, '/flower-house', 'flowerhouse')}
+        role="button"
+        tabIndex={0}
+    >
+        {/* Use the imported icon image */}
+        <img src={flowerHouseIcon} alt="Flower House" className="nav-image" />
+        {/* We will hide the label with CSS to make it a small, clean button */}
+        <h2 className="nav-label">Flower House</h2> 
+    </div>
+    {/* ---------------------------------------------------- */}
+
+    </div>
+  );
+};
+
+export default MainPage;
+/* src/pages/MainPage.css */
+*{
+  font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; /* Playful font */
+}
+.main-page-container {
+  /* Make the UI behave like a mobile app: fixed device-sized container centered on large screens */
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 360px; /* typical mobile width */
+  height: 780px; /* typical mobile height */
+  max-width: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  background-color: #87CEEB; /* Fallback blue color */
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  z-index: 100;
+}
+
+/* Make the background cover the whole screen */
+.background-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures image covers screen without stretching */
+  z-index: 0;
+  border-radius: inherit; /* match rounded container */
+}
+
+/* General styles for the interactive items */
+.nav-item {
+  position: absolute;
+  z-index: 10;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Use a CSS variable so translations (centering) are preserved while scaling on hover */
+  --nav-transform: none;
+  transform: var(--nav-transform) scale(1);
+  transition: transform 0.25s ease, filter 0.3s ease;
+  will-change: transform;
+}
+
+/* Hover effects for interactivity */
+.nav-item:hover {
+  /* Only scale while preserving any translate set by specific position classes */
+  transform: var(--nav-transform) scale(1.1);
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
+}
+
+.nav-image {
+  width: 150px; /* Adjust based on your actual asset size */
+  height: auto;
+  display: block;
+  transition: transform 0.2s ease; /* smooth image transform */
+  transform-origin: center center;
+}
+
+/* Styling the text labels (white text looking like the reference) */
+.nav-label {
+  font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; /* Playful font */
+  color: white;
+  font-size: 1.5rem;
+  margin-top: 5px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  font-weight: normal;
+}
+
+/* Place the Garden label on top of the garden icon without changing icon positioning */
+.garden-position .nav-label {
+  position: absolute;
+  top: 8px; /* small offset from top of the garden area */
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 0; /* override default margin so it doesn't push the image */
+  z-index: 60; /* above the image */
+  pointer-events: none; /* allow clicks to reach the nav-item */
+}
+
+/* --- Positioning Specific Elements --- */
+/* Adjust 'top' and 'left/right' percentages to match your background image exactly */
+
+/* Top Left */
+.volcano-position {
+  /* moved further left 5% and down 5% */
+  top: 35%;
+  left: 1%;
+  --nav-transform: none;
+}
+
+/* Top Right */
+.forest-position {
+  /* moved further right 5% and down 5% */
+  top: 35%;
+  right: 1%;
+  --nav-transform: none;
+}
+
+/* Center / Middle */
+.sailing-position {
+  top: 54%;
+  left: 50%;
+  /* set the nav transform variable so hover scaling preserves centering */
+  --nav-transform: translate(-50%, -50%);
+}
+
+/* Bottom Left */
+.garden-position {
+  /* place at the extreme left (partially outside the app layout) and keep near bottom */
+  bottom: -10%;
+  left: -25%;
+  --nav-transform: none;
+}
+
+/* Enlarge garden image by default (200%) */
+.garden-position .nav-image {
+  width: 400px; /* 150px -> 300px (200%) */
+}
+
+/* Click / active enlargement for items (used when user clicks before navigation) */
+.nav-item.active,
+.nav-item:active {
+  /* subtle scale on press/click */
+  transform: var(--nav-transform) scale(1.15);
+  transition: transform 0.14s ease;
+  z-index: 50; /* bring clicked item above others briefly */
+}
+
+/* Also slightly scale the image itself on hover for an extra subtle effect */
+.nav-item:hover .nav-image {
+  transform: scale(1.06);
+}
+
+/* Sailing boat hover animation */
+.sailing-position .nav-image {
+  transform-origin: center bottom;
+}
+
+.sailing-position:hover .nav-image {
+  animation: sail 2.6s ease-in-out infinite;
+}
+
+@keyframes sail {
+  0% {
+    transform: translateX(0) translateY(0) rotate(0deg) scale(1.06);
+  }
+  40% {
+    transform: translateX(-10px) translateY(8px) rotate(-6deg) scale(1.08);
+  }
+  70% {
+    transform: translateX(8px) translateY(4px) rotate(4deg) scale(1.07);
+  }
+  100% {
+    transform: translateX(0) translateY(0) rotate(0deg) scale(1.06);
+  }
+}
+
+/* OPTIONAL: Media query for mobile phones */
+@media (max-width: 420px) {
+  .main-page-container {
+    /* On small viewports behave as full-screen app */
+    position: relative;
+    left: 0;
+    top: 0;
+    transform: none;
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .nav-image {
+    width: 100px;
+  }
+  
+  .nav-label {
+    font-size: 1rem;
+  }
+}
+
+/* Main Header Container */
+.main-header {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between; /* welcome left, logout right */
+  align-items: flex-start;
+  padding: 0 20px;
+  z-index: 20;
+}
+
+/* Welcome message */
+#welcome_message {
+  font-size: 2rem;
+  color: white;
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+  margin: 0; /* remove any default margin */
+  width: 75%;
+}
+
+/* Logout button */
+.logout-button {
+  padding: 8px 12px;
+  top: 0px;
+  background-color: rgba(255, 85, 85, 0);
+  color: rgb(255, 0, 0);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.logout-button:hover {
+  background-color: rgb(255, 0, 0);
+  color: white;
+}
+

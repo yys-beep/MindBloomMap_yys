@@ -7,7 +7,7 @@ const NavigationButtons = () => {
   const [pressed, setPressed] = useState({});
 
   const buttons = [
-    { alt: 'Back', onClick: () => navigate('/main', { replace: true}), title: 'Go back to previous page' },
+    { alt: 'Back', onClick: () => navigate(-1), title: 'Go back to previous page' },
     { alt: 'Main Page', onClick: () => navigate('/main', { replace: true }), title: 'Return to main page' },
     { alt: 'Profile Page', onClick: () => navigate('/profile'), title: 'Go to profile page' },
   ];

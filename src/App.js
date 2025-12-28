@@ -15,10 +15,12 @@ import Volcano from "./components/Volcano/Volcano";
 import Community from "./components/Community/Community";
 import SelfCare from "./components/SelfCare/SelfCare";
 import MoodGarden from "./components/MoodGarden/MoodGarden";
+import Journal from "./components/Journal/Journal";
 import AIVirtualFriend from "./components/AIVirtualFriend/AIVirtualFriend";
 import EmergencyReport from "./components/EmergencyReport/EmergencyReport";
 import MusicPlayer from "./pages/MusicPlayerPage";
 import FlowerHouse from "./components/FlowerHouse/FlowerHouse";
+
 
 function App() {
   return (
@@ -95,6 +97,14 @@ function App() {
               element={
                 <PrivateRoute>
                   <MoodGarden />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/journal"
+              element={
+                <PrivateRoute>
+                  <Journal />
                 </PrivateRoute>
               }
             />
