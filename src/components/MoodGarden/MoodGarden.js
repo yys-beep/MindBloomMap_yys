@@ -73,9 +73,7 @@ export default function MoodGarden() {
   
   // UI State
   const [showMoodModal, setShowMoodModal] = useState(false);
-  // Note: showJournalModal is no longer used since we navigate away, 
-  // but we keep it in case you want to switch back later.
-  const [showJournalModal, setShowJournalModal] = useState(false);
+  const [showJournalModal, setShowJournalModal] = useState(false); // Kept for logic reference
   const [journalText, setJournalText] = useState("");
   const [showInfoModal, setShowInfoModal] = useState(false);
   
@@ -99,6 +97,7 @@ export default function MoodGarden() {
     return text.trim().split(/\s+/).filter(Boolean).length;
   }
 
+  // 1. LOAD DATA
   useEffect(() => {
     if (authLoading || !currentUser || !docPath) return;
 
@@ -127,6 +126,7 @@ export default function MoodGarden() {
     return () => { mounted = false; };
   }, [docPath, authLoading, currentUser, todayKey]);
 
+  // 2. PERSIST DATA
   async function persist(changes = {}) {
     if (!currentUser || !docPath) return;
     const payload = {
@@ -149,6 +149,30 @@ export default function MoodGarden() {
     }
   }
 
+  // --- NEW FIX: AUTO RECOVERY FOR STUCK STATE ---
+  useEffect(() => {
+    // If progress is 100% but the bloom flag is false, fix it automatically.
+    if (!loading && currentUser && dailyProgress >= MAX_DAILY_GROWTH && !hasBloomedToday) {
+      console.log("Auto-correcting: Progress is 100% but bloom not triggered.");
+      
+      const newFlowerCount = flowersBloomed < MAX_FLOWERS_PER_WEEK ? flowersBloomed + 1 : flowersBloomed;
+
+      // 1. Update UI State immediately
+      setHasBloomedToday(true);
+      setFlowersBloomed(newFlowerCount);
+      showToast("Flower restored! 🌸");
+
+      // 2. Update Firebase
+      persist({
+        dailyProgress: MAX_DAILY_GROWTH,
+        hasBloomedToday: true,
+        hasBloomedTodayDate: todayKey,
+        flowersBloomed: newFlowerCount
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, currentUser, dailyProgress, hasBloomedToday]);
+
   const handlePlantSeed = (index) => {
     setSelectedSeedIndex(index);
     setSeedChosen(true);
@@ -159,47 +183,42 @@ export default function MoodGarden() {
   };
 
   function addProgressPoints(points) {
-    if (dailyProgress >= MAX_DAILY_GROWTH) {
+    // --- UPDATED LOGIC: Don't block if we are at 100 but haven't bloomed yet ---
+    // Only return if we are maxed AND we have bloomed.
+    if (dailyProgress >= MAX_DAILY_GROWTH && hasBloomedToday) {
       showToast("You’ve helped your plant grow as much as it can today 🌱");
       return;
     }
 
     const allowed = Math.min(MAX_DAILY_GROWTH - dailyProgress, points || 0);
-    const newProgress = Math.min(MAX_DAILY_GROWTH, dailyProgress + allowed);
+    // If we are already at 100 (allowed is 0), we still want to fall through to check bloom logic
+    const newProgress = Math.min(MAX_DAILY_GROWTH, dailyProgress + (allowed > 0 ? allowed : 0));
     
-    // Create variables to track changes so we can save them immediately
-    let newFlowersBloomed = flowersBloomed;
-    let newHasBloomedToday = hasBloomedToday;
-    let newLastBloomedIndex = lastBloomedIndex;
-
-    // Check for Bloom
-    if (newProgress >= MAX_DAILY_GROWTH && !hasBloomedToday) {
-      if (flowersBloomed < MAX_FLOWERS_PER_WEEK) {
-        newFlowersBloomed = flowersBloomed + 1;
-        newLastBloomedIndex = newFlowersBloomed - 1;
-        
-        // Update State
-        setFlowersBloomed(newFlowersBloomed);
-        setLastBloomedIndex(newLastBloomedIndex);
-        setTimeout(() => setLastBloomedIndex(null), 900);
-      }
-      
-      newHasBloomedToday = true;
-      setHasBloomedToday(true);
-      showToast("A flower has bloomed today 🌸");
-    }
-
-    // Update Progress State
     setDailyProgress(newProgress);
 
-    // FIX: Save the EXPLICIT new values to Firebase immediately
-    // We do not rely on the state variables here because they might not have updated yet
-    persist({ 
-      dailyProgress: newProgress,
-      flowersBloomed: newFlowersBloomed,
-      hasBloomedToday: newHasBloomedToday,
-      hasBloomedTodayDate: newHasBloomedToday ? todayKey : null
-    });
+    if (newProgress >= MAX_DAILY_GROWTH && !hasBloomedToday) {
+      if (flowersBloomed < MAX_FLOWERS_PER_WEEK) {
+        setFlowersBloomed((prev) => {
+          const newVal = prev + 1;
+          setLastBloomedIndex(newVal - 1);
+          setTimeout(() => setLastBloomedIndex(null), 900);
+          return newVal;
+        });
+      }
+      setHasBloomedToday(true);
+      showToast("A flower has bloomed today 🌸");
+      
+      // Persist the bloom state immediately
+      setTimeout(() => persist({
+          dailyProgress: newProgress,
+          hasBloomedToday: true,
+          hasBloomedTodayDate: todayKey,
+          flowersBloomed: flowersBloomed + 1 // Ensure we save the increment
+      }), 0);
+    } else {
+        // Normal save
+        setTimeout(() => persist({ dailyProgress: newProgress }), 0);
+    }
   }
 
   async function fertilizerChoose(mood) {
@@ -389,7 +408,6 @@ export default function MoodGarden() {
         </div>
       )}
       
-      {/* Journal Modal removed from view since we navigate, but code logic remains above just in case */}
       {toastMsg && <div className="toast">{toastMsg}</div>}
     </div>
   );
