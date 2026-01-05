@@ -163,23 +163,43 @@ export default function MoodGarden() {
       showToast("You’ve helped your plant grow as much as it can today 🌱");
       return;
     }
+
     const allowed = Math.min(MAX_DAILY_GROWTH - dailyProgress, points || 0);
     const newProgress = Math.min(MAX_DAILY_GROWTH, dailyProgress + allowed);
-    setDailyProgress(newProgress);
+    
+    // Create variables to track changes so we can save them immediately
+    let newFlowersBloomed = flowersBloomed;
+    let newHasBloomedToday = hasBloomedToday;
+    let newLastBloomedIndex = lastBloomedIndex;
 
+    // Check for Bloom
     if (newProgress >= MAX_DAILY_GROWTH && !hasBloomedToday) {
       if (flowersBloomed < MAX_FLOWERS_PER_WEEK) {
-        setFlowersBloomed((prev) => {
-          const newVal = prev + 1;
-          setLastBloomedIndex(newVal - 1);
-          setTimeout(() => setLastBloomedIndex(null), 900);
-          return newVal;
-        });
+        newFlowersBloomed = flowersBloomed + 1;
+        newLastBloomedIndex = newFlowersBloomed - 1;
+        
+        // Update State
+        setFlowersBloomed(newFlowersBloomed);
+        setLastBloomedIndex(newLastBloomedIndex);
+        setTimeout(() => setLastBloomedIndex(null), 900);
       }
+      
+      newHasBloomedToday = true;
       setHasBloomedToday(true);
       showToast("A flower has bloomed today 🌸");
     }
-    setTimeout(() => persist(), 0);
+
+    // Update Progress State
+    setDailyProgress(newProgress);
+
+    // FIX: Save the EXPLICIT new values to Firebase immediately
+    // We do not rely on the state variables here because they might not have updated yet
+    persist({ 
+      dailyProgress: newProgress,
+      flowersBloomed: newFlowersBloomed,
+      hasBloomedToday: newHasBloomedToday,
+      hasBloomedTodayDate: newHasBloomedToday ? todayKey : null
+    });
   }
 
   async function fertilizerChoose(mood) {

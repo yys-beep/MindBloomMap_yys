@@ -14,11 +14,11 @@ import profilePic from '../assets/images/profilepic.png';
 
 // Context & Service
 import { useAuth } from '../context/AuthContext';
-import { getUser } from '../firebases/firebaseService';
+// FIX: Import updateUser
+import { getUser, updateUser } from '../firebases/firebaseService'; 
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-  // FIX: Destructure 'currentUser' to match your AuthContext definition (seen in LoginPage)
   const { currentUser } = useAuth(); 
   const fileInputRef = useRef(null);
 
@@ -38,9 +38,7 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        // FIX: Use 'currentUser' instead of 'authUser'
         if (!currentUser || !currentUser.uid) {
-           // Allow loading to finish so we don't block UI, but user might be guest
            setIsLoading(false);
            return;
         }
@@ -87,17 +85,38 @@ const ProfilePage = () => {
     }
   };
 
-  const handleDone = () => {
-    setProfileData({ ...profileData, name: tempName, avatar: tempAvatar });
-    setIsEditModalOpen(false);
-    // TODO: Add your save logic here (updateProfile/Firebase)
+  // --- FIX: HANDLE DONE (Update Username) ---
+  const handleDone = async () => {
+    if (!currentUser || !currentUser.uid) return;
+
+    try {
+      // 1. Update in Firebase
+      await updateUser(currentUser.uid, {
+        username: tempName,
+        // TODO: Handle avatar upload to storage if selectedFile is present
+        // avatar: newAvatarUrl 
+      });
+
+      // 2. Update Local State
+      setProfileData(prev => ({
+        ...prev,
+        name: tempName,
+        avatar: tempAvatar // For now, just update preview locally
+      }));
+
+      setIsEditModalOpen(false);
+      alert("Profile updated successfully!");
+
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("Failed to update profile. Please try again.");
+    }
   };
 
-  // --- FIX: LOGOUT LOGIC ---
   const handleLogout = async () => {
     try {
       const auth = getAuth();
-      await signOut(auth); // This automatically triggers the Context to update currentUser to null
+      await signOut(auth);
       navigate("/login", { replace: true });
     } catch (error) {
       console.error("Logout Error:", error);

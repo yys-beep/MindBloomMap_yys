@@ -15,7 +15,7 @@ const styles = {
         background: 'white', 
         borderRadius: '25px', 
         maxWidth: '95%',
-        width: '600px', // Slightly wider to accommodate more info
+        width: '500px', // Slightly reduced width for vertical layout look
         maxHeight: '90vh', 
         overflowY: 'auto', 
         boxShadow: '0 10px 40px rgba(0,0,0,0.2)', 
@@ -31,27 +31,48 @@ const styles = {
     },
     weekLabel: { fontSize: '1.8rem', margin: '0', color: '#4A4A4A' },
     dateRange: { fontSize: '1rem', color: '#777', margin: '5px 0 0 0' },
+    
+    // --- CHANGED: Layout is now vertical (column) ---
     contentWrapper: {
-        display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start',
-        marginTop: '20px', gap: '15px', 
+        display: 'flex', 
+        flexDirection: 'column', // Stack items vertically
+        alignItems: 'center',    // Center items horizontally
+        marginTop: '10px', 
+        gap: '20px', 
     },
+    
+    // --- CHANGED: Left Panel (Flower) takes full width and centers content ---
     leftPanel: { 
-        flex: '0 0 30%', display: 'flex', flexDirection: 'column', alignItems: 'center',
-        padding: '10px', marginTop: '20px', 
+        width: '100%',
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center',
+        padding: '10px', 
+        marginTop: '0', 
     },
-    rightPanel: { flex: '1', padding: '10px 0 10px 5px' },
-    journalHeading: { marginTop: '0px', marginBottom: '15px', fontSize: '1.1rem' },
+    
+    // --- CHANGED: Right Panel (List) takes full width ---
+    rightPanel: { 
+        width: '100%', 
+        padding: '0 10px' 
+    },
+
+    journalHeading: { marginTop: '0px', marginBottom: '15px', fontSize: '1.3rem', textAlign: 'center' },
+    
     flowerImage: { 
-        width: '140px', height: 'auto', marginBottom: '15px', objectFit: 'contain',
+        width: '160px', // Slightly larger for emphasis
+        height: 'auto', 
+        marginBottom: '10px', 
+        objectFit: 'contain',
         filter: 'drop-shadow(2px 2px 5px rgba(0,0,0,0.2))',
     },
+    
     journalEntry: { 
-        padding: '12px', marginBottom: '12px', borderLeft: '4px solid #8ABAC5', 
-        backgroundColor: '#f9f9f9', borderRadius: '8px', position: 'relative'
+        padding: '12px', marginBottom: '12px', borderLeft: '5px solid #ccc', 
+        backgroundColor: '#f9f9f9', borderRadius: '8px', position: 'relative',
+        boxShadow: '0 2px 5px rgba(0,0,0,0.05)' 
     },
     noteText: { fontSize: '0.9rem', marginTop: '5px', color: '#555', display: 'block', lineHeight: '1.4' },
-    
-    // --- NEW STYLES FOR MULTIPLE ENTRIES ---
     moreButton: {
         display: 'inline-block',
         marginTop: '8px',
@@ -65,10 +86,9 @@ const styles = {
         fontWeight: 'bold',
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
     },
-    // Sub-modal styles for viewing all entries of a day
     subBackdrop: {
         position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-        backgroundColor: 'rgba(0,0,0,0.3)', zIndex: 2000, // Higher than main modal
+        backgroundColor: 'rgba(0,0,0,0.3)', zIndex: 2000, 
         display: 'flex', justifyContent: 'center', alignItems: 'center'
     },
     subModal: {
@@ -87,39 +107,49 @@ const getQualitativeMoodLabel = (avgScore) => {
 };
 
 const WeeklyDetailModal = ({ weeklyLogs, weekDetails, onClose }) => { 
-    
-    // State to handle the "View All Entries" sub-modal
-    const [expandedDay, setExpandedDay] = useState(null); // { dateLabel: "Jan 5", entries: [] }
+    const [expandedDay, setExpandedDay] = useState(null); 
 
     const logsArray = useMemo(() => Array.isArray(weeklyLogs) ? weeklyLogs : [], [weeklyLogs]); 
     const { flower, avgScore } = useMemo(() => getWeeklyFlowerData(logsArray), [logsArray]);
     const qualitativeMood = getQualitativeMoodLabel(avgScore); 
 
+    const cleanNote = (text) => {
+        if (!text) return '';
+        return text.replace(/^(?:[A-Za-z]{3}\s\d{1,2}\s(?:entry,)?\s*)/, '').trim();
+    };
+
+    // Robust Color Lookup
+    const getMoodColor = (emotion) => {
+        if (!emotion) return '#888'; 
+        if (MOOD_PALETTE[emotion]) return MOOD_PALETTE[emotion].color;
+        const capitalized = emotion.charAt(0).toUpperCase() + emotion.slice(1);
+        if (MOOD_PALETTE[capitalized]) return MOOD_PALETTE[capitalized].color;
+        const lower = emotion.toLowerCase();
+        if (MOOD_PALETTE[lower]) return MOOD_PALETTE[lower].color;
+        return '#888'; 
+    };
+
     const daysOfWeek = useMemo(() => {
+        if (!weekDetails || !weekDetails.startDate) return [];
+
         const fullDayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        
-        // --- 1. Group logs by date ---
-        // logsMap will store an ARRAY of logs for each date
         const logsMap = new Map();
         
         logsArray.forEach(log => {
             if(log.date) {
-                if (!logsMap.has(log.date)) {
-                    logsMap.set(log.date, []);
-                }
+                if (!logsMap.has(log.date)) logsMap.set(log.date, []);
                 logsMap.get(log.date).push(log);
             }
         });
 
         const calendarBlock = [];
         const [day, month, year] = weekDetails.startDate.split('/');
-        
-        // Create Local Date Object
+        if (!day || !month || !year) return [];
+
         let currentDay = new Date(`${year}-${month}-${day}`); 
         currentDay.setHours(0, 0, 0, 0);
 
         for (let i = 0; i < 7; i++) {
-            // Manual string construction
             const y = currentDay.getFullYear();
             const m = String(currentDay.getMonth() + 1).padStart(2, '0');
             const d = String(currentDay.getDate()).padStart(2, '0');
@@ -127,22 +157,36 @@ const WeeklyDetailModal = ({ weeklyLogs, weekDetails, onClose }) => {
 
             const dayLogs = logsMap.get(dateKey) || [];
             
+            // 1. Daily Mood (Header) - from Mood Garden
+            const moodLog = dayLogs.filter(l => l.moodID).pop();
+            
+            // 2. Journal Entries (List)
+            const journalEntries = dayLogs.filter(l => l.journalID);
+
             const dayName = fullDayNames[currentDay.getDay()];
             const dateLabel = currentDay.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            
+            const moodEmotion = moodLog ? moodLog.emotion : null;
+            const journalCount = journalEntries.length;
 
-            // If we have logs, pick the LAST one (assuming latest) to show on the card
-            // But keep the whole array available for the "See More" feature
-            if (dayLogs.length > 0) {
-                const latestLog = dayLogs[dayLogs.length - 1]; 
+            if (moodEmotion || journalCount > 0) {
+                let displayText = '';
+                let listEmotion = 'neutral'; 
+                
+                if (journalCount > 0) {
+                    const latestJournal = journalEntries[journalEntries.length - 1];
+                    displayText = cleanNote(latestJournal.content);
+                    listEmotion = latestJournal.emotionTag || latestJournal.emotion || 'neutral';
+                }
+
                 calendarBlock.push({
                     dayName,
                     dateLabel,
-                    latestLog: {
-                        emotion: latestLog.emotion,
-                        note: latestLog.content || latestLog.note,
-                    },
-                    allLogs: dayLogs, // Pass all logs for this day
-                    count: dayLogs.length,
+                    headerMood: moodEmotion, 
+                    listEmotion: listEmotion, 
+                    displayText: displayText,
+                    allJournals: journalEntries,
+                    journalCount: journalCount,
                     isLogged: true
                 });
             } else {
@@ -155,19 +199,14 @@ const WeeklyDetailModal = ({ weeklyLogs, weekDetails, onClose }) => {
             currentDay.setDate(currentDay.getDate() + 1);
         }
         return calendarBlock;
-    }, [logsArray, weekDetails.startDate]);
+    }, [logsArray, weekDetails]);
 
     const weekLabel = weekDetails?.weekLabel || 'Weekly Archive'; 
     const fullStartDate = weekDetails?.startDate || 'N/A'; 
     const fullEndDate = weekDetails?.endDate || 'N/A';     
-
     const condensedDateRange = `${fullStartDate} – ${fullEndDate}`;
 
-    // Helper to clean up "Day DD entry" text if it exists in notes
-    const cleanNote = (text) => {
-        if (!text) return 'No text content.';
-        return text.replace(/^(?:[A-Za-z]{3}\s\d{1,2}\s(?:entry,)?\s*)/, '').trim();
-    };
+    if (!weekDetails) return null;
 
     return (
         <div style={styles.backdrop} onClick={onClose}>
@@ -180,56 +219,77 @@ const WeeklyDetailModal = ({ weeklyLogs, weekDetails, onClose }) => {
                 </div>
                 
                 <div style={styles.contentWrapper}>
-                    {/* Left Panel: Flower & Mood */}
+                    {/* Flower Section on TOP */}
                     <div style={styles.leftPanel}>
                         <img src={flower.imagePath} alt={flower.name} style={styles.flowerImage} />
                         <p style={{
-                            fontSize: '1.1rem', fontWeight: 'bold', color: qualitativeMood.color, 
+                            fontSize: '1.2rem', fontWeight: 'bold', color: qualitativeMood.color, 
                             marginTop: '0', textAlign: 'center'
                         }}>
                             Overall Mood: {qualitativeMood.label}
                         </p>
                     </div>
                     
-                    {/* Right Panel: List of Days */}
+                    {/* List Section BELOW */}
                     <div style={styles.rightPanel}>
                         <h4 style={styles.journalHeading}>Daily Mood & Journal</h4>
                         
                         {daysOfWeek.map((dayEntry, index) => {
                             if (dayEntry.isLogged) {
-                                const { latestLog, count, allLogs } = dayEntry;
-                                const noteContent = cleanNote(latestLog.note);
-                                const dayTitle = `${dayEntry.dateLabel}, ${dayEntry.dayName} - ${latestLog.emotion}`;
-                                const moodColor = MOOD_PALETTE[latestLog.emotion]?.color || '#555';
+                                const { headerMood, listEmotion, displayText, journalCount, allJournals } = dayEntry;
+                                
+                                const activeColor = headerMood 
+                                    ? getMoodColor(headerMood)
+                                    : (journalCount > 0 ? getMoodColor(listEmotion) : '#ccc');
+
+                                const moodSuffix = headerMood ? ` - ${headerMood}` : '';
+                                const headerText = `${dayEntry.dateLabel}, ${dayEntry.dayName}${moodSuffix}`;
 
                                 return (
-                                    <div key={index} style={{...styles.journalEntry, borderLeftColor: moodColor }}>
-                                        <p style={{ fontWeight: 'bold', margin: '0 0 5px 0', color: moodColor }}>
-                                            {dayTitle}
+                                    <div key={index} style={{
+                                        ...styles.journalEntry, 
+                                        borderLeftColor: activeColor,
+                                        backgroundColor: '#f9f9f9' 
+                                    }}>
+                                        <p style={{ 
+                                            fontWeight: 'bold', 
+                                            margin: '0 0 5px 0', 
+                                            color: headerMood ? getMoodColor(headerMood) : '#555'
+                                        }}>
+                                            {headerText}
                                         </p>
-                                        <span style={styles.noteText}>{noteContent}</span>
                                         
-                                        {/* --- NEW: Show "View All" button if multiple entries exist --- */}
-                                        {count > 1 && (
-                                            <button 
-                                                style={styles.moreButton}
-                                                onClick={() => setExpandedDay({ 
-                                                    dateLabel: `${dayEntry.dayName}, ${dayEntry.dateLabel}`, 
-                                                    entries: allLogs 
-                                                })}
-                                            >
-                                                View all {count} entries
-                                            </button>
+                                        {journalCount > 0 && (
+                                            <>
+                                                <span style={styles.noteText}>
+                                                    {displayText}
+                                                </span>
+                                                {journalCount > 1 && (
+                                                    <button 
+                                                        style={styles.moreButton}
+                                                        onClick={() => setExpandedDay({ 
+                                                            dateLabel: headerText, 
+                                                            entries: allJournals 
+                                                        })}
+                                                    >
+                                                        View all {journalCount} entries
+                                                    </button>
+                                                )}
+                                            </>
+                                        )}
+                                        {journalCount === 0 && (
+                                            <span style={{fontSize:'0.85rem', color:'#999', fontStyle:'italic'}}>
+                                                (No journal entry)
+                                            </span>
                                         )}
                                     </div>
                                 );
                             } else {
-                                // No Entry Styling
-                                const dayTitle = `${dayEntry.dateLabel}, ${dayEntry.dayName} - ?`;
+                                const dayTitle = `${dayEntry.dateLabel}, ${dayEntry.dayName}`;
                                 return (
                                     <div key={index} style={{...styles.journalEntry, borderLeftColor: '#aaa' }}>
                                         <p style={{ fontWeight: 'bold', margin: '0 0 5px 0', color: '#777' }}>{dayTitle}</p>
-                                        <span style={{ ...styles.noteText, color: '#777', fontStyle: 'italic', marginTop: '0' }}>
+                                        <span style={{ ...styles.noteText, color: '#999', fontStyle: 'italic', marginTop: '0' }}>
                                             No entry
                                         </span>
                                     </div>
@@ -240,7 +300,7 @@ const WeeklyDetailModal = ({ weeklyLogs, weekDetails, onClose }) => {
                 </div>
             </div>
 
-            {/* --- SUB-MODAL: Shows ALL entries for a specific day --- */}
+            {/* --- SUB-MODAL --- */}
             {expandedDay && (
                 <div style={styles.subBackdrop} onClick={() => setExpandedDay(null)}>
                     <div style={styles.subModal} onClick={(e) => e.stopPropagation()}>
@@ -251,12 +311,13 @@ const WeeklyDetailModal = ({ weeklyLogs, weekDetails, onClose }) => {
                             Close
                         </button>
                         <h3 style={{marginTop: 0, color: '#4A4A4A', borderBottom:'1px solid #eee', paddingBottom:'10px'}}>
-                            Entries for {expandedDay.dateLabel}
+                            {expandedDay.dateLabel}
                         </h3>
                         
                         <div style={{ marginTop: '15px' }}>
                             {expandedDay.entries.map((log, idx) => {
-                                const moodColor = MOOD_PALETTE[log.emotion]?.color || '#555';
+                                const entryEmotion = log.emotionTag || log.emotion || 'neutral';
+                                const moodColor = getMoodColor(entryEmotion);
                                 const note = cleanNote(log.content || log.note);
                                 
                                 return (
@@ -265,9 +326,8 @@ const WeeklyDetailModal = ({ weeklyLogs, weekDetails, onClose }) => {
                                         borderRadius: '8px', borderLeft: `4px solid ${moodColor}`
                                     }}>
                                         <div style={{display:'flex', justifyContent:'space-between', marginBottom:'5px'}}>
-                                            <span style={{fontWeight:'bold', color: moodColor}}>{log.emotion}</span>
+                                            <span style={{fontWeight:'bold', color: moodColor}}>{entryEmotion}</span>
                                             <span style={{fontSize:'0.8rem', color:'#999'}}>
-                                                {/* If you have timestamps, you could show time here. Otherwise just Entry # */}
                                                 Entry #{idx + 1}
                                             </span>
                                         </div>
